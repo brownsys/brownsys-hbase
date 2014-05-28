@@ -114,7 +114,7 @@ if "%in_dev_env%"=="true" (
 	  goto :eof
   )
 
-  for /f "delims=" %%i in ('type "%cached_classpath_filename%"') do set CLASSPATH=%CLASSPATH%;%%i
+  set CLASSPATH=!CLASSPATH!;%HBASE_HOME%\target\lib\*
 )
 
 @rem For releases add hbase webapps to CLASSPATH
