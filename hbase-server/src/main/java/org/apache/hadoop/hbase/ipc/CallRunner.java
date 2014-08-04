@@ -32,6 +32,8 @@ import org.cloudera.htrace.TraceScope;
 
 import com.google.protobuf.Message;
 
+import edu.brown.cs.systems.xtrace.XTrace;
+
 /**
  * The request processing logic, which is usually executed in thread pools provided by an
  * {@link RpcScheduler}.  Call {@link #run()} to actually execute the contained
@@ -67,6 +69,8 @@ public class CallRunner {
 
   public void run() {
     try {
+	  XTrace.stop();
+	  XTrace.set(call.xtrace);
       if (!call.connection.channel.isOpen()) {
         if (RpcServer.LOG.isDebugEnabled()) {
           RpcServer.LOG.debug(Thread.currentThread().getName() + ": skipped " + call);
@@ -139,6 +143,8 @@ public class CallRunner {
     } catch (Exception e) {
       RpcServer.LOG.warn(Thread.currentThread().getName()
           + ": caught: " + StringUtils.stringifyException(e));
+    } finally {
+      XTrace.stop();
     }
   }
 

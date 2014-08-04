@@ -121,6 +121,9 @@ import com.google.protobuf.Message;
 import com.google.protobuf.Message.Builder;
 import com.google.protobuf.ServiceException;
 import com.google.protobuf.TextFormat;
+
+import edu.brown.cs.systems.xtrace.Context;
+import edu.brown.cs.systems.xtrace.XTrace;
 // Uses Writables doing sasl
 
 /**
@@ -287,6 +290,8 @@ public class RpcServer implements RpcServerInterface {
     protected long size;                          // size of current call
     protected boolean isError;
     protected TraceInfo tinfo;
+    
+    protected Context xtrace;
 
     Call(int id, final BlockingService service, final MethodDescriptor md, RequestHeader header,
          Message param, CellScanner cellScanner, Connection connection, Responder responder,
@@ -305,6 +310,7 @@ public class RpcServer implements RpcServerInterface {
       this.isError = false;
       this.size = size;
       this.tinfo = tinfo;
+      this.xtrace = XTrace.get();
     }
 
     @Override
@@ -1673,6 +1679,9 @@ public class RpcServer implements RpcServerInterface {
       if (LOG.isTraceEnabled()) {
         LOG.trace("RequestHeader " + TextFormat.shortDebugString(header) +
           " totalRequestSize: " + totalRequestSize + " bytes");
+      }
+      if (header.hasXtrace()) {
+    	  XTrace.set(header.getXtrace().toByteArray());
       }
       // Enforcing the call queue size, this triggers a retry in the client
       // This is a bit late to be doing this check - we have already read in the total request.

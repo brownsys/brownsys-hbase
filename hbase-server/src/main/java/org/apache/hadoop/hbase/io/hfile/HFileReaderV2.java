@@ -44,6 +44,8 @@ import org.apache.hadoop.io.WritableUtils;
 import org.cloudera.htrace.Trace;
 import org.cloudera.htrace.TraceScope;
 
+import edu.brown.cs.systems.xtrace.XTrace;
+
 /**
  * {@link HFile} reader for version 2.
  */
@@ -51,6 +53,7 @@ import org.cloudera.htrace.TraceScope;
 public class HFileReaderV2 extends AbstractHFileReader {
 
   private static final Log LOG = LogFactory.getLog(HFileReaderV2.class);
+  private static final XTrace.Logger XTRACE = XTrace.getLogger(HFileReaderV2.class);
 
   /** Minor versions in HFile V2 starting with this number have hbase checksums */
   public static final int MINOR_VERSION_WITH_CHECKSUM = 1;
@@ -313,6 +316,7 @@ public class HFileReaderV2 extends AbstractHFileReader {
     boolean useLock = false;
     IdLock.Entry lockEntry = null;
     TraceScope traceScope = Trace.startSpan("HFileReaderV2.readBlock");
+    XTRACE.log("HFileReaderV2.readBlock");
     try {
       while (true) {
         if (useLock) {
@@ -350,6 +354,7 @@ public class HFileReaderV2 extends AbstractHFileReader {
         if (Trace.isTracing()) {
           traceScope.getSpan().addTimelineAnnotation("blockCacheMiss");
         }
+        XTRACE.log("blockCacheMiss");
         // Load block from filesystem.
         long startTimeNs = System.nanoTime();
         HFileBlock hfileBlock = fsBlockReader.readBlockData(dataBlockOffset, onDiskBlockSize, -1,
