@@ -122,6 +122,7 @@ message RequestHeader {
   // 0 is NORMAL priority.  100 is HIGH.  If no priority, treat it as NORMAL.
   // See HConstants.
   optional uint32 priority = 6;
+  optional bytes xtrace = 7;
 }
 
 message ResponseHeader {
@@ -130,4 +131,5 @@ message ResponseHeader {
   optional ExceptionResponse exception = 2;
   // If present, then an encoded data block follows.
   optional CellBlockMeta cell_block_meta = 3;
+  optional bytes xtrace = 4;
 }

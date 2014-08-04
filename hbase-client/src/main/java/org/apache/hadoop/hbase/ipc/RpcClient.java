@@ -97,12 +97,16 @@ import org.cloudera.htrace.Trace;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.protobuf.BlockingRpcChannel;
+import com.google.protobuf.ByteString;
 import com.google.protobuf.Descriptors.MethodDescriptor;
 import com.google.protobuf.Message;
 import com.google.protobuf.Message.Builder;
 import com.google.protobuf.RpcController;
 import com.google.protobuf.ServiceException;
 import com.google.protobuf.TextFormat;
+
+import edu.brown.cs.systems.xtrace.Context;
+import edu.brown.cs.systems.xtrace.XTrace;
 
 
 /**
@@ -279,6 +283,7 @@ public class RpcClient {
     boolean done;                                 // true when call is done
     long startTime;
     final MethodDescriptor md;
+    Context xtrace;									// xtrace context for rejoining the call
 
     protected Call(final MethodDescriptor md, Message param, final CellScanner cells,
         final Message responseDefaultType) {
@@ -302,6 +307,7 @@ public class RpcClient {
      * value or error are available.  Notifies by default.  */
     protected synchronized void callComplete() {
       this.done = true;
+      this.xtrace = XTrace.get();
       notify();                                 // notify caller
     }
 
@@ -1033,6 +1039,9 @@ public class RpcClient {
           builder.setTraceInfo(RPCTInfo.newBuilder().
             setParentId(s.getSpanId()).setTraceId(s.getTraceId()));
         }
+        if (XTrace.active()) {
+        	builder.setXtrace(ByteString.copyFrom(XTrace.bytes()));
+        }
         builder.setMethodName(call.md.getName());
         builder.setRequestParam(call.param != null);
         ByteBuffer cellBlock = ipcUtil.buildCellBlock(this.codec, this.compressor, call.cells);
@@ -1071,6 +1080,9 @@ public class RpcClient {
         // Read the header
         ResponseHeader responseHeader = ResponseHeader.parseDelimitedFrom(in);
         int id = responseHeader.getCallId();
+        if (responseHeader.hasXtrace()) {
+        	XTrace.set(responseHeader.getXtrace().toByteArray());
+        }
         if (LOG.isDebugEnabled()) {
           LOG.debug(getName() + ": got response header " +
             TextFormat.shortDebugString(responseHeader) + ", totalSize: " + totalSize + " bytes");
@@ -1130,6 +1142,7 @@ public class RpcClient {
         if (remoteId.rpcTimeout > 0) {
           cleanupCalls(remoteId.rpcTimeout);
         }
+        XTrace.stop();
       }
     }
 

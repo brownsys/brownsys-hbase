@@ -3682,6 +3682,16 @@ public final class RPCProtos {
      * </pre>
      */
     int getPriority();
+
+    // optional bytes xtrace = 7;
+    /**
+     * <code>optional bytes xtrace = 7;</code>
+     */
+    boolean hasXtrace();
+    /**
+     * <code>optional bytes xtrace = 7;</code>
+     */
+    com.google.protobuf.ByteString getXtrace();
   }
   /**
    * Protobuf type {@code RequestHeader}
@@ -3782,6 +3792,11 @@ public final class RPCProtos {
             case 48: {
               bitField0_ |= 0x00000020;
               priority_ = input.readUInt32();
+              break;
+            }
+            case 58: {
+              bitField0_ |= 0x00000040;
+              xtrace_ = input.readBytes();
               break;
             }
           }
@@ -3997,6 +4012,22 @@ public final class RPCProtos {
       return priority_;
     }
 
+    // optional bytes xtrace = 7;
+    public static final int XTRACE_FIELD_NUMBER = 7;
+    private com.google.protobuf.ByteString xtrace_;
+    /**
+     * <code>optional bytes xtrace = 7;</code>
+     */
+    public boolean hasXtrace() {
+      return ((bitField0_ & 0x00000040) == 0x00000040);
+    }
+    /**
+     * <code>optional bytes xtrace = 7;</code>
+     */
+    public com.google.protobuf.ByteString getXtrace() {
+      return xtrace_;
+    }
+
     private void initFields() {
       callId_ = 0;
       traceInfo_ = org.apache.hadoop.hbase.protobuf.generated.TracingProtos.RPCTInfo.getDefaultInstance();
@@ -4004,6 +4035,7 @@ public final class RPCProtos {
       requestParam_ = false;
       cellBlockMeta_ = org.apache.hadoop.hbase.protobuf.generated.RPCProtos.CellBlockMeta.getDefaultInstance();
       priority_ = 0;
+      xtrace_ = com.google.protobuf.ByteString.EMPTY;
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -4034,6 +4066,9 @@ public final class RPCProtos {
       }
       if (((bitField0_ & 0x00000020) == 0x00000020)) {
         output.writeUInt32(6, priority_);
+      }
+      if (((bitField0_ & 0x00000040) == 0x00000040)) {
+        output.writeBytes(7, xtrace_);
       }
       getUnknownFields().writeTo(output);
     }
@@ -4067,6 +4102,10 @@ public final class RPCProtos {
       if (((bitField0_ & 0x00000020) == 0x00000020)) {
         size += com.google.protobuf.CodedOutputStream
           .computeUInt32Size(6, priority_);
+      }
+      if (((bitField0_ & 0x00000040) == 0x00000040)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(7, xtrace_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -4121,6 +4160,11 @@ public final class RPCProtos {
         result = result && (getPriority()
             == other.getPriority());
       }
+      result = result && (hasXtrace() == other.hasXtrace());
+      if (hasXtrace()) {
+        result = result && getXtrace()
+            .equals(other.getXtrace());
+      }
       result = result &&
           getUnknownFields().equals(other.getUnknownFields());
       return result;
@@ -4157,6 +4201,10 @@ public final class RPCProtos {
       if (hasPriority()) {
         hash = (37 * hash) + PRIORITY_FIELD_NUMBER;
         hash = (53 * hash) + getPriority();
+      }
+      if (hasXtrace()) {
+        hash = (37 * hash) + XTRACE_FIELD_NUMBER;
+        hash = (53 * hash) + getXtrace().hashCode();
       }
       hash = (29 * hash) + getUnknownFields().hashCode();
       memoizedHashCode = hash;
@@ -4293,6 +4341,8 @@ public final class RPCProtos {
         bitField0_ = (bitField0_ & ~0x00000010);
         priority_ = 0;
         bitField0_ = (bitField0_ & ~0x00000020);
+        xtrace_ = com.google.protobuf.ByteString.EMPTY;
+        bitField0_ = (bitField0_ & ~0x00000040);
         return this;
       }
 
@@ -4353,6 +4403,10 @@ public final class RPCProtos {
           to_bitField0_ |= 0x00000020;
         }
         result.priority_ = priority_;
+        if (((from_bitField0_ & 0x00000040) == 0x00000040)) {
+          to_bitField0_ |= 0x00000040;
+        }
+        result.xtrace_ = xtrace_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -4388,6 +4442,9 @@ public final class RPCProtos {
         }
         if (other.hasPriority()) {
           setPriority(other.getPriority());
+        }
+        if (other.hasXtrace()) {
+          setXtrace(other.getXtrace());
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
@@ -4911,6 +4968,42 @@ public final class RPCProtos {
         return this;
       }
 
+      // optional bytes xtrace = 7;
+      private com.google.protobuf.ByteString xtrace_ = com.google.protobuf.ByteString.EMPTY;
+      /**
+       * <code>optional bytes xtrace = 7;</code>
+       */
+      public boolean hasXtrace() {
+        return ((bitField0_ & 0x00000040) == 0x00000040);
+      }
+      /**
+       * <code>optional bytes xtrace = 7;</code>
+       */
+      public com.google.protobuf.ByteString getXtrace() {
+        return xtrace_;
+      }
+      /**
+       * <code>optional bytes xtrace = 7;</code>
+       */
+      public Builder setXtrace(com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000040;
+        xtrace_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional bytes xtrace = 7;</code>
+       */
+      public Builder clearXtrace() {
+        bitField0_ = (bitField0_ & ~0x00000040);
+        xtrace_ = getDefaultInstance().getXtrace();
+        onChanged();
+        return this;
+      }
+
       // @@protoc_insertion_point(builder_scope:RequestHeader)
     }
 
@@ -4986,6 +5079,16 @@ public final class RPCProtos {
      * </pre>
      */
     org.apache.hadoop.hbase.protobuf.generated.RPCProtos.CellBlockMetaOrBuilder getCellBlockMetaOrBuilder();
+
+    // optional bytes xtrace = 4;
+    /**
+     * <code>optional bytes xtrace = 4;</code>
+     */
+    boolean hasXtrace();
+    /**
+     * <code>optional bytes xtrace = 4;</code>
+     */
+    com.google.protobuf.ByteString getXtrace();
   }
   /**
    * Protobuf type {@code ResponseHeader}
@@ -5067,6 +5170,11 @@ public final class RPCProtos {
                 cellBlockMeta_ = subBuilder.buildPartial();
               }
               bitField0_ |= 0x00000004;
+              break;
+            }
+            case 34: {
+              bitField0_ |= 0x00000008;
+              xtrace_ = input.readBytes();
               break;
             }
           }
@@ -5193,10 +5301,27 @@ public final class RPCProtos {
       return cellBlockMeta_;
     }
 
+    // optional bytes xtrace = 4;
+    public static final int XTRACE_FIELD_NUMBER = 4;
+    private com.google.protobuf.ByteString xtrace_;
+    /**
+     * <code>optional bytes xtrace = 4;</code>
+     */
+    public boolean hasXtrace() {
+      return ((bitField0_ & 0x00000008) == 0x00000008);
+    }
+    /**
+     * <code>optional bytes xtrace = 4;</code>
+     */
+    public com.google.protobuf.ByteString getXtrace() {
+      return xtrace_;
+    }
+
     private void initFields() {
       callId_ = 0;
       exception_ = org.apache.hadoop.hbase.protobuf.generated.RPCProtos.ExceptionResponse.getDefaultInstance();
       cellBlockMeta_ = org.apache.hadoop.hbase.protobuf.generated.RPCProtos.CellBlockMeta.getDefaultInstance();
+      xtrace_ = com.google.protobuf.ByteString.EMPTY;
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -5219,6 +5344,9 @@ public final class RPCProtos {
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         output.writeMessage(3, cellBlockMeta_);
       }
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        output.writeBytes(4, xtrace_);
+      }
       getUnknownFields().writeTo(output);
     }
 
@@ -5239,6 +5367,10 @@ public final class RPCProtos {
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(3, cellBlockMeta_);
+      }
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(4, xtrace_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -5278,6 +5410,11 @@ public final class RPCProtos {
         result = result && getCellBlockMeta()
             .equals(other.getCellBlockMeta());
       }
+      result = result && (hasXtrace() == other.hasXtrace());
+      if (hasXtrace()) {
+        result = result && getXtrace()
+            .equals(other.getXtrace());
+      }
       result = result &&
           getUnknownFields().equals(other.getUnknownFields());
       return result;
@@ -5302,6 +5439,10 @@ public final class RPCProtos {
       if (hasCellBlockMeta()) {
         hash = (37 * hash) + CELL_BLOCK_META_FIELD_NUMBER;
         hash = (53 * hash) + getCellBlockMeta().hashCode();
+      }
+      if (hasXtrace()) {
+        hash = (37 * hash) + XTRACE_FIELD_NUMBER;
+        hash = (53 * hash) + getXtrace().hashCode();
       }
       hash = (29 * hash) + getUnknownFields().hashCode();
       memoizedHashCode = hash;
@@ -5428,6 +5569,8 @@ public final class RPCProtos {
           cellBlockMetaBuilder_.clear();
         }
         bitField0_ = (bitField0_ & ~0x00000004);
+        xtrace_ = com.google.protobuf.ByteString.EMPTY;
+        bitField0_ = (bitField0_ & ~0x00000008);
         return this;
       }
 
@@ -5476,6 +5619,10 @@ public final class RPCProtos {
         } else {
           result.cellBlockMeta_ = cellBlockMetaBuilder_.build();
         }
+        if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
+          to_bitField0_ |= 0x00000008;
+        }
+        result.xtrace_ = xtrace_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -5500,6 +5647,9 @@ public final class RPCProtos {
         }
         if (other.hasCellBlockMeta()) {
           mergeCellBlockMeta(other.getCellBlockMeta());
+        }
+        if (other.hasXtrace()) {
+          setXtrace(other.getXtrace());
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
@@ -5867,6 +6017,42 @@ public final class RPCProtos {
         return cellBlockMetaBuilder_;
       }
 
+      // optional bytes xtrace = 4;
+      private com.google.protobuf.ByteString xtrace_ = com.google.protobuf.ByteString.EMPTY;
+      /**
+       * <code>optional bytes xtrace = 4;</code>
+       */
+      public boolean hasXtrace() {
+        return ((bitField0_ & 0x00000008) == 0x00000008);
+      }
+      /**
+       * <code>optional bytes xtrace = 4;</code>
+       */
+      public com.google.protobuf.ByteString getXtrace() {
+        return xtrace_;
+      }
+      /**
+       * <code>optional bytes xtrace = 4;</code>
+       */
+      public Builder setXtrace(com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000008;
+        xtrace_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional bytes xtrace = 4;</code>
+       */
+      public Builder clearXtrace() {
+        bitField0_ = (bitField0_ & ~0x00000008);
+        xtrace_ = getDefaultInstance().getXtrace();
+        onChanged();
+        return this;
+      }
+
       // @@protoc_insertion_point(builder_scope:ResponseHeader)
     }
 
@@ -5927,15 +6113,16 @@ public final class RPCProtos {
       "\001(\r\"|\n\021ExceptionResponse\022\034\n\024exception_cl" +
       "ass_name\030\001 \001(\t\022\023\n\013stack_trace\030\002 \001(\t\022\020\n\010h" +
       "ostname\030\003 \001(\t\022\014\n\004port\030\004 \001(\005\022\024\n\014do_not_re",
-      "try\030\005 \001(\010\"\246\001\n\rRequestHeader\022\017\n\007call_id\030\001" +
+      "try\030\005 \001(\010\"\266\001\n\rRequestHeader\022\017\n\007call_id\030\001" +
       " \001(\r\022\035\n\ntrace_info\030\002 \001(\0132\t.RPCTInfo\022\023\n\013m" +
       "ethod_name\030\003 \001(\t\022\025\n\rrequest_param\030\004 \001(\010\022" +
       "\'\n\017cell_block_meta\030\005 \001(\0132\016.CellBlockMeta" +
-      "\022\020\n\010priority\030\006 \001(\r\"q\n\016ResponseHeader\022\017\n\007" +
-      "call_id\030\001 \001(\r\022%\n\texception\030\002 \001(\0132\022.Excep" +
-      "tionResponse\022\'\n\017cell_block_meta\030\003 \001(\0132\016." +
-      "CellBlockMetaB<\n*org.apache.hadoop.hbase" +
-      ".protobuf.generatedB\tRPCProtosH\001\240\001\001"
+      "\022\020\n\010priority\030\006 \001(\r\022\016\n\006xtrace\030\007 \001(\014\"\201\001\n\016R" +
+      "esponseHeader\022\017\n\007call_id\030\001 \001(\r\022%\n\texcept" +
+      "ion\030\002 \001(\0132\022.ExceptionResponse\022\'\n\017cell_bl" +
+      "ock_meta\030\003 \001(\0132\016.CellBlockMeta\022\016\n\006xtrace" +
+      "\030\004 \001(\014B<\n*org.apache.hadoop.hbase.protob" +
+      "uf.generatedB\tRPCProtosH\001\240\001\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -5971,13 +6158,13 @@ public final class RPCProtos {
           internal_static_RequestHeader_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_RequestHeader_descriptor,
-              new java.lang.String[] { "CallId", "TraceInfo", "MethodName", "RequestParam", "CellBlockMeta", "Priority", });
+              new java.lang.String[] { "CallId", "TraceInfo", "MethodName", "RequestParam", "CellBlockMeta", "Priority", "Xtrace", });
           internal_static_ResponseHeader_descriptor =
             getDescriptor().getMessageTypes().get(5);
           internal_static_ResponseHeader_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_ResponseHeader_descriptor,
-              new java.lang.String[] { "CallId", "Exception", "CellBlockMeta", });
+              new java.lang.String[] { "CallId", "Exception", "CellBlockMeta", "Xtrace", });
           return null;
         }
       };
