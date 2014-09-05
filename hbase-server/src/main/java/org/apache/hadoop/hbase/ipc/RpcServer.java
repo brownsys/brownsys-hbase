@@ -115,6 +115,7 @@ import org.codehaus.jackson.map.ObjectMapper;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.protobuf.BlockingService;
+import com.google.protobuf.ByteString;
 import com.google.protobuf.CodedInputStream;
 import com.google.protobuf.Descriptors.MethodDescriptor;
 import com.google.protobuf.Message;
@@ -151,6 +152,7 @@ public class RpcServer implements RpcServerInterface {
   // The logging package is deliberately outside of standard o.a.h.h package so it is not on
   // by default.
   public static final Log LOG = LogFactory.getLog("org.apache.hadoop.ipc.RpcServer");
+  public static final XTrace.Logger xtrace = XTrace.getLogger(RpcServer.class);
 
   private final boolean authorize;
   private boolean isSecurityEnabled;
@@ -364,6 +366,9 @@ public class RpcServer implements RpcServerInterface {
         Message result = (Message)m;
         // Call id.
         headerBuilder.setCallId(this.id);
+        if (XTrace.active()) {
+        	headerBuilder.setXtrace(ByteString.copyFrom(XTrace.bytes()));
+        }
         if (t != null) {
           ExceptionResponse.Builder exceptionBuilder = ExceptionResponse.newBuilder();
           exceptionBuilder.setExceptionClassName(t.getClass().getName());
@@ -588,6 +593,7 @@ public class RpcServer implements RpcServerInterface {
                 }
               }
               key = null;
+              XTrace.stop();
             }
           } catch (InterruptedException e) {
             if (running) {                      // unexpected -- log it
@@ -2016,6 +2022,8 @@ public class RpcServer implements RpcServerInterface {
       status.setRPCPacket(param);
       status.resume("Servicing call");
       //get an instance of the method arg type
+      if (xtrace.valid())
+    	  xtrace.log("Servicing call", "Call", CurCall.get().toString());
       long startTime = System.currentTimeMillis();
       PayloadCarryingRpcController controller = new PayloadCarryingRpcController(cellScanner);
       Message result = service.callBlockingMethod(md, controller, param);
