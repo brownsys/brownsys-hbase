@@ -994,6 +994,7 @@ public class RpcServer implements RpcServerInterface {
       boolean done = false;       // there is more data for this channel.
       int numElements;
       Call call = null;
+  	  Context xtrace_before = XTrace.get();
       try {
         //noinspection SynchronizationOnLocalVariableOrMethodParameter
         synchronized (responseQueue) {
@@ -1009,6 +1010,7 @@ public class RpcServer implements RpcServerInterface {
           // Extract the first call
           //
           call = responseQueue.removeFirst();
+          XTrace.set(call.xtrace);
           SocketChannel channel = call.connection.channel;
           //
           // Send as much data as we can in the non-blocking fashion
@@ -1054,6 +1056,7 @@ public class RpcServer implements RpcServerInterface {
           done = true;               // error. no more data for this channel.
           closeConnection(call.connection);
         }
+  	    XTrace.set(xtrace_before);
       }
       return done;
     }
@@ -1087,6 +1090,7 @@ public class RpcServer implements RpcServerInterface {
       call.timestamp = System.currentTimeMillis();
 
       boolean doRegister = false;
+  	  call.xtrace = XTrace.get();
       synchronized (call.connection.responseQueue) {
         call.connection.responseQueue.addLast(call);
         if (call.connection.responseQueue.size() == 1) {
