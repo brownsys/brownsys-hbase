@@ -44,6 +44,8 @@ import org.apache.hadoop.io.WritableUtils;
 import org.cloudera.htrace.Trace;
 import org.cloudera.htrace.TraceScope;
 
+import edu.brown.cs.systems.resourcethrottling.LocalThrottlingPoints;
+import edu.brown.cs.systems.resourcethrottling.ThrottlingPoint;
 import edu.brown.cs.systems.xtrace.XTrace;
 
 /**
@@ -54,6 +56,7 @@ public class HFileReaderV2 extends AbstractHFileReader {
 
   private static final Log LOG = LogFactory.getLog(HFileReaderV2.class);
   private static final XTrace.Logger XTRACE = XTrace.getLogger(HFileReaderV2.class);
+  private static final ThrottlingPoint blockReaderThrottler = LocalThrottlingPoints.getThrottlingPoint("HFileReader");
 
   /** Minor versions in HFile V2 starting with this number have hbase checksums */
   public static final int MINOR_VERSION_WITH_CHECKSUM = 1;

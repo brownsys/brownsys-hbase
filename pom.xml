@@ -1424,6 +1424,11 @@
       <artifactId>xtrace-resource-tracing</artifactId>
       <version>1.0</version>
     </dependency>
+    <dependency>
+      <groupId>edu.brown.cs.systems</groupId>
+      <artifactId>resourcethrottling</artifactId>
+      <version>1.0</version>
+    </dependency>
   </dependencies>
   <!--
   To publish, use the following settings.xml file ( placed in ~/.m2/settings.xml )
