@@ -29,6 +29,13 @@ import org.apache.hadoop.hbase.HConstants;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
+import edu.brown.cs.systems.resourcereporting.LocalResources;
+import edu.brown.cs.systems.resourcereporting.aggregators.QueueAggregator;
+import edu.brown.cs.systems.resourcethrottling.LocalThrottlingPoints;
+import edu.brown.cs.systems.resourcetracing.resources.QueueResource;
+import edu.brown.cs.systems.xtrace.Reporter.Utils;
+import edu.brown.cs.systems.xtrace.XTrace;
+
 /**
  * A scheduler that maintains isolated handler pools for general, high-priority and replication
  * requests.
@@ -36,6 +43,8 @@ import com.google.common.collect.Lists;
 @InterfaceAudience.Private
 @InterfaceStability.Evolving
 public class SimpleRpcScheduler implements RpcScheduler {
+
+  private final QueueAggregator callQueueAggregator;
 
   private int port;
   private final int handlerCount;
@@ -73,7 +82,12 @@ public class SimpleRpcScheduler implements RpcScheduler {
     this.replicationHandlerCount = replicationHandlerCount;
     this.priority = priority;
     this.highPriorityLevel = highPriorityLevel;
-    this.callQueue = new LinkedBlockingQueue<CallRunner>(maxQueueLength);
+    
+//    this.callQueue = new LinkedBlockingQueue<CallRunner>(maxQueueLength);
+    String queueName = Utils.getProcessName()+"-RpcScheduler";
+    this.callQueue = LocalThrottlingPoints.getThrottlingQueue(queueName);
+    this.callQueueAggregator = LocalResources.getQueueAggregator(queueName);
+    
     this.priorityCallQueue = priorityHandlerCount > 0
         ? new LinkedBlockingQueue<CallRunner>(maxQueueLength)
         : null;
@@ -90,24 +104,25 @@ public class SimpleRpcScheduler implements RpcScheduler {
   @Override
   public void start() {
     running = true;
-    startHandlers(handlerCount, callQueue, null);
+    startHandlers(handlerCount, callQueue, null, callQueueAggregator);
     if (priorityCallQueue != null) {
-      startHandlers(priorityHandlerCount, priorityCallQueue, "Priority.");
+      startHandlers(priorityHandlerCount, priorityCallQueue, "Priority.", null);
     }
     if (replicationQueue != null) {
-      startHandlers(replicationHandlerCount, replicationQueue, "Replication.");
+      startHandlers(replicationHandlerCount, replicationQueue, "Replication.", null);
     }
   }
 
   private void startHandlers(
       int handlerCount,
       final BlockingQueue<CallRunner> callQueue,
-      String threadNamePrefix) {
+      String threadNamePrefix,
+      final QueueAggregator rsrc) {
     for (int i = 0; i < handlerCount; i++) {
       Thread t = new Thread(new Runnable() {
         @Override
         public void run() {
-          consumerLoop(callQueue);
+          consumerLoop(callQueue, rsrc);
         }
       });
       t.setDaemon(true);
@@ -129,11 +144,14 @@ public class SimpleRpcScheduler implements RpcScheduler {
   public void dispatch(CallRunner callTask) throws InterruptedException {
     RpcServer.Call call = callTask.getCall();
     int level = priority.getPriority(call.header, call.param);
+    callTask.tenant = XTrace.getTenantClass(call.xtrace);
+    callTask.enqueue = System.nanoTime();
     if (priorityCallQueue != null && level > highPriorityLevel) {
       priorityCallQueue.put(callTask);
     } else if (replicationQueue != null && level == HConstants.REPLICATION_QOS) {
       replicationQueue.put(callTask);
     } else {
+      callQueueAggregator.starting(callTask.tenant);
       callQueue.put(callTask); // queue the call; maybe blocked here
     }
   }
@@ -153,11 +171,14 @@ public class SimpleRpcScheduler implements RpcScheduler {
     return replicationQueue == null ? 0 : replicationQueue.size();
   }
 
-  private void consumerLoop(BlockingQueue<CallRunner> myQueue) {
+  private void consumerLoop(BlockingQueue<CallRunner> myQueue, QueueAggregator rsrc) {
     while (running) {
       try {
         CallRunner task = myQueue.take();
+        task.dequeue = System.nanoTime();
         task.run();
+        task.complete = System.nanoTime();
+        if (rsrc!=null) rsrc.finished(task.tenant, task.complete-task.dequeue, task.complete-task.enqueue);
       } catch (InterruptedException e) {
         Thread.currentThread().interrupt();
       }

@@ -45,6 +45,11 @@ public class CallRunner {
   private final RpcServerInterface rpcServer;
   private final MonitoredRPCHandler status;
   private UserProvider userProvider;
+  
+  public int tenant;
+  public long enqueue;
+  public long dequeue;
+  public long complete;
 
   /**
    * On construction, adds the size of this call to the running count of outstanding call sizes.
