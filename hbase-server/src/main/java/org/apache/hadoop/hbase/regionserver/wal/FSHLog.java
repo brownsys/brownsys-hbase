@@ -68,6 +68,8 @@ import org.cloudera.htrace.TraceScope;
 
 import com.google.common.annotations.VisibleForTesting;
 
+import edu.brown.cs.systems.resourcetracing.backgroundtasks.HBaseBatchTasks;
+
 /**
  * HLog stores all the edits to the HStore.  Its the hbase write-ahead-log
  * implementation.
@@ -1041,6 +1043,7 @@ class FSHLog implements HLog, Syncable {
           // sync txn to file system
           this.sync(txid);
         }
+        HBaseBatchTasks.FSHLOG.contribute(edits.heapSize());
         return txid;
       } finally {
         traceScope.close();
@@ -1212,6 +1215,7 @@ class FSHLog implements HLog, Syncable {
 
           // 2. do 'sync' to HDFS to provide durability
           long now = EnvironmentEdgeManager.currentTimeMillis();
+          HBaseBatchTasks.FSHLOG.start();
           try {
             if (writer == null) {
               // the only possible case where writer == null is as below:
@@ -1250,7 +1254,9 @@ class FSHLog implements HLog, Syncable {
 
             this.isSyncing = false;
           }
-          metrics.finishSync(EnvironmentEdgeManager.currentTimeMillis() - now);
+          long duration = EnvironmentEdgeManager.currentTimeMillis() - now;
+          metrics.finishSync(duration);
+          HBaseBatchTasks.FSHLOG.complete(1, duration);
 
           // 3. wake up AsyncNotifier to notify(wake-up) all pending 'put'
           // handler threads on 'sync()'
