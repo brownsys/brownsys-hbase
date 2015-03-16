@@ -713,6 +713,10 @@
               <groupId>edu.brown.cs.systems</groupId>
               <artifactId>xtrace-resource-tracing</artifactId>
             </aspectLibrary>
+            <aspectLibrary>
+              <groupId>edu.brown.cs.systems</groupId>
+              <artifactId>pivot-tracing</artifactId>
+            </aspectLibrary>
           </aspectLibraries>
         </configuration>
         <executions>
@@ -1427,6 +1431,11 @@
     <dependency>
       <groupId>edu.brown.cs.systems</groupId>
       <artifactId>resourcethrottling</artifactId>
+      <version>1.0</version>
+    </dependency>
+    <dependency>
+      <groupId>edu.brown.cs.systems</groupId>
+      <artifactId>pivot-tracing</artifactId>
       <version>1.0</version>
     </dependency>
   </dependencies>

@@ -34,6 +34,8 @@ import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 
+import edu.brown.cs.systems.pivottracing.PivotTracingPubSub;
+
 /**
  * Base class for command lines that start up various HBase daemons.
  */
@@ -122,6 +124,7 @@ public abstract class ServerCommandLine extends Configured implements Tool {
    * a nonzero exit code is returned from <code>run()</code>.
    */
   public void doMain(String args[]) {
+    PivotTracingPubSub.initialize();
     try {
       int ret = ToolRunner.run(HBaseConfiguration.create(), this, args);
       if (ret != 0) {
